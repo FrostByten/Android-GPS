@@ -1,0 +1,5 @@
+AuthUserFile /opt/lampp/htdocs/.htpasswd
+AuthGroupFile /dev/null
+AuthName "GPS Tracking Area"
+AuthType Basic
+require valid-user 
