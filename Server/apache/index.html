@@ -15,16 +15,11 @@
     <script language="JavaScript" src="javascript/JSFX_Layer.js"></script>
 	<script language="JavaScript" src="javascript/JSFX_Mouse.js"></script>
 	<script language="JavaScript" src="javascript/JSFX_pinwheel.js"></script>
+	<script language="JavaScript" src="javascript/markers.js"></script>
 	<script language="JavaScript">
 		function JSFX_StartEffects()
 		{
 			JSFX.Pinwheel();
-		}
-		
-		function initialize()
-    	{
-			var mapProp = {center:new google.maps.LatLng(49.266667, -122.966667), zoom:12, mapTypeId:google.maps.MapTypeId.ROADMAP};
-			var map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
 		}
 		
     	snowStorm.snowColor = '#ffff00';
@@ -42,7 +37,7 @@
   	<img src="http://i.picasion.com/gl/79/4oem.gif" style="display: block; margin-left: auto; margin-right: auto;" width="1014" height="88"/>
   	<br />
   	<img src="http://img2.wikia.nocookie.net/__cb20130513231837/creepypasta/images/3/33/Glitter.gif" width="300" height="209" style="float: left; padding: 0px; margin: 0px; border: 0px; display;"/>
-  	<div id="googleMap" style="width:700px;height:460px; border: 4px; border-style: dotted solid double dashed; border-radius: 25px; box-shadow: 10px 10px 5px #45A809; margin: 0; padding: 0px; right: 0; left: 0; transform: scaleX(-1); -webkit-transform: scaleX(-1);"></div>
+  	<div id="googleMap" style="width:700px;height:460px; border: 4px; border-style: dotted solid double dashed; border-radius: 25px; box-shadow: 10px 10px 5px #45A809; margin: 0; padding: 0px; right: 0; left: 0;"></div>
   	<img src="http://img2.wikia.nocookie.net/__cb20130513231837/creepypasta/images/3/33/Glitter.gif" width="300" height="209" style="float: right; padding: 0px; margin: 0px; border: 0px; display: inline; position: relative; top: -465px; transform: scaleX(-1); -webkit-transform: scaleX(-1);"/>
   </body>
 </html>
