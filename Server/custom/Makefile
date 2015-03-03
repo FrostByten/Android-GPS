@@ -6,4 +6,4 @@ all: server.o
 server.o:
 	$(ASM) --32 server.asm -o server.o
 clean:
-	rm -f *.o *.out core.*
+	rm -f *.o *.out core.* server

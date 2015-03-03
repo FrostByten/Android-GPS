@@ -1,18 +1,24 @@
-#! ------------------------------------- !#
-#! | XML GPS location server		   | !#
-#! | -- Receives XML formatted info    | !#
-#! | -- from clients with GPS data     | !#
-#! | -- and appends it to a master file| !#
-#! | 							       | !#
-#! | Design by: Lewis Scott			   | !#
-#! | Programming by: Lewis Scott	   | !#
-#! |								   | !#
-#! | Date: March 3rd, 2015			   | !#
-#! ------------------------------------- !#
+#! ----------------------------------------- !#
+#! | XML GPS location server			   | !#
+#! | -- Receives XML formatted info  	   | !#
+#! | -- from clients with GPS data   	   | !#
+#! | -- and appends it to a master file	   | !#
+#! | 							   	       | !#
+#! | Design by: Lewis Scott				   | !#
+#! | Programming by: Lewis Scott		   | !#
+#! |									   | !#
+#! | Date: March 3rd, 2015				   | !#
+#! ----------------------------------------- !#
 
 # Symbols
 .equiv port_num, 8088
 .equiv socket_reg, %ebp
+.equiv buff_size, 1024
+
+.bss
+	file: .int 0
+	client_socket: .int 0
+.text
 
 # Main macro
 .macro server
@@ -27,6 +33,8 @@
 
 # Setup the socket and listen on it
 .macro setup
+	try_file
+
 	print_message $loading_msg,$loading_len
 
 	open_socket
@@ -40,11 +48,38 @@
 # The main loop
 .macro loop
 	begin_loop:
+		accept
+		print_message $client_msg,$client_len
+		fork
+.endm
+
+# Check arguments and try to get file descriptor
+.macro try_file
+	movl 0(%esp),%eax
+	cmp $2,%eax
+	jl usage
+	jmp after
 	
-	accept
-	print_message $client_msg,$client_len
-	jmp begin_loop
-	#fork
+	usage:
+		print_message $usage_msg,$usage_len
+		exit $1
+		
+	after:
+		movl $2,%ecx		# O_RDWR
+		movl 8(%esp),%ebx	# argv[1]
+		movl $5,%eax		# open
+		int $0x80			# systemcall
+		
+		cmp $0,%eax
+		jl fnf
+		jmp done
+		
+	fnf:
+		print_message $fnf_msg,$fnf_len
+		exit $1
+		
+	done:
+		mov %eax,(file)
 .endm
 
 # Open a socket
@@ -64,6 +99,7 @@
 	pop_regs
 .endm
 
+# Set the stack to be able to re-use the address we bind the socket to
 .macro set_reuse
 	push_regs
 	
@@ -83,6 +119,7 @@
 	pop_regs
 .endm
 
+# Bind the socket to the port
 .macro bind
 	.data
 		address: .short 2 							  # AF_INET
@@ -105,6 +142,7 @@
 		pop_regs
 .endm
 
+# Listen on the socket
 .macro listen
 	push_regs
 	
@@ -139,6 +177,8 @@
 		movl $102,%eax			# socketcall
 		int $0x80				# systemcall
 		
+		mov %eax,(client_socket)# Get the returned connection
+		
 		check_err
 		
 		pop_regs
@@ -146,20 +186,63 @@
 
 # Fork the process
 .macro fork
-	movl $FORK, %eax # fork
+	movl $2,%eax 	 # fork
 	int $0x80		 # systemcall
 	
 	cmp $0,%eax
 	jg parent
 	jz child
-	checkerr
+	check_err
 	
 	parent:
-		
+		#movl (client_socket),%ebx
+		#movl $6,%eax				# close
+		#int $0x80					# systemcall
+		jmp begin_loop
 	
 	child:
-		
+		child_loop
+		exit 0
+.endm
+
+.macro child_loop
+	.bss
+		bytes_read: .int 0
+		buffer: .fill buff_size, 1, 0 # Create a buffer and zero it
+	.text
 	
+	request_parent_kill:
+		movl $1,%ecx		# SIGHUP
+		movl $1,%ebx		# PR_SET_PDEATHSIG
+		movl $72,%eax		# SYS_PRCTL
+		int $0x80			# systemcall
+	
+		movl (client_socket), socket_reg
+		
+	size_read_loop:
+		movl $4,%edx
+		subl bytes_read,%edx			# read sizeof(int) - bytes_read
+		
+		cmp $0,%edx
+		jle data_read_loop				# if <= 0, continue to data reading
+		
+		movl buffer,%ecx
+		movl (client_socket),%ebx
+		movl $3,%eax					# read
+		int $0x80						# systemcall
+		
+		check_err
+		addl %eax,bytes_read			# increase by the number of bytes we read
+		
+		jmp size_read_loop
+		
+	data_read_loop:
+		# read the data
+		jmp handle_data
+		
+	handle_data:
+		# deal with the data
+		jmp size_read_loop 				# loop
 .endm
 
 # Check the return of a system call for error
@@ -187,6 +270,10 @@
 
 # Exit the program
 .macro exit return
+	movl $file,%ebx
+	movl $6,%eax		# close
+	int $0x80			# syscall
+
 	movl \return,%ebx
 	movl $1,%eax		# exit
 	int $0x80			# syscall
@@ -208,6 +295,7 @@
 	pop %edx
 .endm
 
+# Create a new allocated variable
 .macro newvar var, contents:vararg
 	.data
 	\var: \contents
@@ -227,7 +315,7 @@ error_occured:
 		.ascii "Loading server...\n"
 		loading_len = . - loading_msg
 	client_msg:
-		.ascii "Got a client!\n"
+		.ascii "Accepted a new client!\n"
 		client_len = . - client_msg
 	error_msg:
 		.ascii "An error occured... Exiting!\n"
@@ -235,3 +323,9 @@ error_occured:
 	ready_msg:
 		.ascii "Server ready, listening...\n"
 		ready_len = . - ready_msg
+	usage_msg:
+		.ascii "Usage: ./server {file path}\n"
+		usage_len = . - usage_msg
+	fnf_msg:
+		.ascii "File not found...\n"
+		fnf_len = . - fnf_msg
