@@ -4,5 +4,10 @@
     <string name="app_name">Client</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="IPLabel">IP Address</string>
+    <string name="IP">xx.xx.xx.xx</string>
+    <string name="PortLabel">Port Number</string>
+    <string name="Port">7000</string>
+    <string name="Button">Go</string>
 
 </resources>

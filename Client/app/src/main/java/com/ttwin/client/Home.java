@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 
 
 public class Home extends Activity {
@@ -32,5 +34,12 @@ public class Home extends Activity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void go(View view) {
+        String ip = ((EditText)findViewById(R.id.IP)).getText().toString();
+        String port = ((EditText)findViewById(R.id.Port)).getText().toString();
+
+        
     }
 }
