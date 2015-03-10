@@ -19,7 +19,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:textSize="32dp" />
+        android:textSize="24dp" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -40,13 +40,13 @@
         android:layout_below="@id/IP"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="96dp"
-        android:textSize="20dp" />
+        android:textSize="24dp" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/Port"
-        android:text="Port Number"
+        android:text="@string/Port"
         android:background="@drawable/rectangle"
         android:layout_below="@+id/PortLabel"
         android:layout_centerHorizontal="true"
