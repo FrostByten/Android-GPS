@@ -16,6 +16,10 @@ import java.net.InetAddress;
 
 public class Home extends Activity {
     SharedPreferences pref;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
