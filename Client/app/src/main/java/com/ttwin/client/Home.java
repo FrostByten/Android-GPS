@@ -3,6 +3,7 @@ package com.ttwin.client;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,8 +11,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.ExecutionException;
 
 
 public class Home extends Activity {
@@ -53,9 +55,32 @@ public class Home extends Activity {
 
     private boolean valid(String ip, String port) {
         int portsize = port.length();
-        InetAddress address;
-        String[] rawipstring;
-        byte[] rawip = new byte[4];
+        //InetAddress address;
+        //String[] rawipstring;
+        //byte[] rawip = new byte[4];
+
+        Boolean validAddress = false;
+
+        try
+        {
+            validAddress = new AddressValidation().execute(ip).get();
+            if(!validAddress)
+            {
+                Toast.makeText(getApplicationContext(), "Invalid ip address", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        }
+        catch(InterruptedException e)
+        {
+            Toast.makeText(getApplicationContext(), "Network Interrupted", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        catch(ExecutionException e)
+        {
+            Toast.makeText(getApplicationContext(), "Execution Error", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
         for (int i = 0; i < portsize; i++)
         {
             if (!(Character.isDigit(port.charAt(i))))
@@ -64,29 +89,7 @@ public class Home extends Activity {
                 return false;
             }
         }
-        // Check if host name or ip address
-        if (ip.charAt(0) > 57 || ip.charAt(0) < 48)
-        {
-            try{
-                address = InetAddress.getByName(ip);
-            } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), "Invalid host name", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        } else
-        {
-            try{
-                rawipstring = ip.split(".");
-                for (int i = 0; i < rawipstring.length; i++)
-                {
-                    rawip[i] = Byte.parseByte(rawipstring[i]);
-                }
-                address = InetAddress.getByAddress(rawip);
-            } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), "Invalid ip address", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
+
         Toast.makeText(getApplicationContext(), "connection successful", Toast.LENGTH_SHORT).show();
 
         return true;
@@ -111,5 +114,45 @@ public class Home extends Activity {
         intent.putExtras(b);
         startActivity(intent);
         finish();
+    }
+
+    private class AddressValidation extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... ip) {
+
+            InetAddress address;
+            String[] rawipstring;
+            byte[] rawip = new byte[4];
+
+            // Check if host name or ip address
+            if (ip[0].charAt(0) > 57 || ip[0].charAt(0) < 48)
+            {
+                try{
+                    address = InetAddress.getByName(ip[0]);
+                } catch (UnknownHostException e) {
+                    return false;
+                }
+            } else
+            {
+                try{
+                    rawipstring = ip[0].split(".");
+                    for (int i = 0; i < rawipstring.length; i++)
+                    {
+                        rawip[i] = Byte.parseByte(rawipstring[i]);
+                    }
+                    address = InetAddress.getByAddress(rawip);
+                } catch (UnknownHostException e) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            //do nothing
+        }
     }
 }
