@@ -2,6 +2,7 @@ package com.ttwin.client;
 
 
 import android.content.Context;
+import android.location.Location;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,7 +23,7 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class XMLHandler {
 
-    Document doc;
+    Document Doc;
     DocumentBuilderFactory DocFactory;
     DocumentBuilder  DocBuilder;
 
@@ -32,8 +33,11 @@ public class XMLHandler {
     Element TimeElement;
     Element GPS;
 
+    private Context AppContext;
+
     public XMLHandler(Context c)
     {
+        AppContext = c;
         DocFactory = DocumentBuilderFactory.newInstance();
         try
         {
@@ -56,20 +60,35 @@ public class XMLHandler {
      */
     public void WriteXMLFile()
     {
-        doc = DocBuilder.newDocument();
+        Doc = DocBuilder.newDocument();
 
-        Entry = doc.createElement("ENTRY");   // I don't know if the server's expecting from this level or DATA.
-        doc.appendChild(Entry);
+        Entry = Doc.createElement("ENTRY");   // I don't know if the server's expecting from this level or DATA.
+        Doc.appendChild(Entry);
 
         updateTime();
+        updateGPS();
 
+
+    }
+
+
+    public Document getXML()
+    {
+        return Doc;
+    }
+
+    public void updateGPS()
+    {
+        GPSHelper gps = new GPSHelper(AppContext);
+
+        Location loc = gps.getLocation();
     }
 
     public void updateTime()
     {
-        TimeElement = doc.createElement("TIME");
-        TimeElement.appendChild(doc.createTextNode());
-        doc.appendChild(TimeElement);
+        TimeElement = Doc.createElement("TIME");
+        TimeElement.appendChild(Doc.createTextNode());
+        Doc.appendChild(TimeElement);
     }
 
     /**
