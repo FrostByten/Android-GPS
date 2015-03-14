@@ -1,5 +1,24 @@
 package com.ttwin.client;
 
+/**
+ * Client home activity to initialize the connection to the server
+ *
+ * @sourceFile	Home.java
+ *
+ * @program		Client
+ *
+ * @date		2015-03-09
+ *
+ * @revision	none
+ *
+ * @designer	Thomas Tallentire
+ *
+ * @programmer	Thomas Tallentire
+ * @programmer  Marc Rafanan
+ *
+ * @note
+ */
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,13 +34,56 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
 
-
+/**
+ * Home class - home activity to initialize the connection to the server
+ * @class       Home
+ *
+ * @sourceFile	Home.java
+ *
+ * @program		Client
+ *
+ * @method	protected void onCreate(Bundle savedInstanceState)
+ * @method	public boolean onCreateOptionsMenu(Menu menu)
+ * @method	public boolean onOptionsItemSelected(MenuItem item)
+ * @method	private boolean valid(String ip, String port)
+ * @method	public void go(View view)
+ *
+ * @date		2015-03-09
+ *
+ * @revision	none
+ *
+ * @designer	Thomas Tallentire
+ *
+ * @programmer	Thomas Tallentire
+ * @programmer	Marc Rafanan
+ *
+ * @note
+ */
 public class Home extends Activity {
     SharedPreferences pref;
 
-
-
-
+    /**
+     * Main method at activity startup
+     *
+     * @method      onCreate
+     *
+     * @date		2015-03-09
+     *
+     * @revisions	none
+     *
+     * @designer	Thomas Tallentire
+     *
+     * @programmer	Thomas Tallentire
+     * @programmer	Marc Rafanan
+     *
+     * @notes
+     *
+     * @signature	protected void onCreate(Bundle savedInstanceState)
+     *
+     * @param		savedInstanceState - Bundle for the activity
+     *
+     * @return       void
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +95,11 @@ public class Home extends Activity {
 
     }
 
-
+    /**
+     * Default Activity onCreateOptionsMenu method
+     * @param menu
+     * @return
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -41,6 +107,11 @@ public class Home extends Activity {
         return true;
     }
 
+    /**
+     * Default onOptionsItemSelected method
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -53,11 +124,30 @@ public class Home extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Method for validating host and port inputs
+     *
+     * @method	    valid
+     *
+     * @date		2015-03-09
+     *
+     * @revisions	none
+     *
+     * @designer	Thomas Tallentire
+     *
+     * @programmer	Thomas Tallentire
+     * @programmer	Marc Rafanan
+     *
+     * @notes
+     *
+     * @signature	private boolean valid(String ip, String port)
+     *
+     * @param ip    - string ip either host name or actual ip of the server
+     * @param port  - port number of the server
+     * @return      boolean - valid or invalid inputs
+     */
     private boolean valid(String ip, String port) {
         int portsize = port.length();
-        //InetAddress address;
-        //String[] rawipstring;
-        //byte[] rawip = new byte[4];
 
         Boolean validAddress = false;
 
@@ -95,6 +185,29 @@ public class Home extends Activity {
         return true;
     }
 
+    /**
+     * On click method for GO button in home activity
+     *
+     * @method	    go
+     *
+     * @date		2015-03-09
+     *
+     * @revisions	none
+     *
+     * @designer	Thomas Tallentire
+     *
+     * @programmer	Thomas Tallentire
+     * @programmer	Marc Rafanan
+     *
+     * @notes       The method will pass the ip and port number to the Sending activity
+     *              to start sending gps locations.
+     *
+     * @signature   public void go(View view)
+     *
+     * @param view  - view from which the onClick event came from
+     *
+     * @return  void
+     */
     public void go(View view) {
         SharedPreferences.Editor editor = pref.edit();
         String ip = ((EditText)findViewById(R.id.IP)).getText().toString();
@@ -116,8 +229,52 @@ public class Home extends Activity {
         //finish(); // commented out to let the sending activity go back to home
     }
 
+    /**
+     * AddressValidation inner class
+     * @class       AddressValidation
+     *
+     * @method	protected void onPostExecute(Boolean result)
+     * @method	protected Boolean doInBackground(String... ip)
+     *
+     * @date		2015-03-09
+     *
+     * @revision	none
+     *
+     * @designer	Marc Rafanan
+     * @designer    Thomas Tallentire
+     *
+     * @programmer	Marc Rafanan
+     * @programmer	Thomas Tallentire
+     *
+     * @note        An inner class that extends AsyncTask to do the actual server validation. This
+     *              is used because Android will complain if there are network processes (or any
+     *              long running process) running in the main UI thread.
+     *
+     */
     private class AddressValidation extends AsyncTask<String, Void, Boolean> {
 
+        /**
+         * Default doInBackground method for the AsyncTask
+         *
+         * @method	    doInBackground
+         *
+         * @date		2015-03-09
+         *
+         * @revisions	none
+         *
+         * @designer	Marc Rafanan
+         * @designer    Thomas Tallentire
+         *
+         * @programmer	Marc Rafanan
+         * @programmer	Thomas Tallentire
+         *
+         * @notes       The method will validate if the hostname or ip is valid
+         *
+         * @signature   protected Boolean doInBackground(String... ip)
+         *
+         * @param ip
+         * @return Boolean - valid or invalid ip
+         */
         @Override
         protected Boolean doInBackground(String... ip) {
 
@@ -150,6 +307,10 @@ public class Home extends Activity {
             return true;
         }
 
+        /**
+         * Default onPostExecute Method
+         * @param result
+         */
         @Override
         protected void onPostExecute(Boolean result) {
             //do nothing
