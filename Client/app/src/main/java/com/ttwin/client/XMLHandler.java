@@ -81,6 +81,11 @@ public class XMLHandler {
         InfoNode = Doc.createElement("INFO");
         Entry.appendChild(InfoNode);
 
+        updateTime();
+        updateGPS();
+        updateIdent();
+        updateInfo();
+
     }
 
     /**
