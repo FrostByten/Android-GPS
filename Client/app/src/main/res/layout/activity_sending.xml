@@ -15,7 +15,8 @@
       android:text="@string/Send"
       android:background="@drawable/label"
       android:layout_centerVertical="true"
-      android:layout_centerHorizontal="true"/>
+      android:layout_centerHorizontal="true"
+      android:onClick="sendLocation"/>
 
     <Button
         android:layout_width="wrap_content"
@@ -23,6 +24,7 @@
         android:text="@string/Stop"
         android:background="@drawable/label"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:onClick="goHome"/>
 
 </RelativeLayout>

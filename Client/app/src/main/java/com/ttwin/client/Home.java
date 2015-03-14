@@ -113,7 +113,7 @@ public class Home extends Activity {
         Intent intent = new Intent(this, Sending.class);
         intent.putExtras(b);
         startActivity(intent);
-        finish();
+        //finish(); // commented out to let the sending activity go back to home
     }
 
     private class AddressValidation extends AsyncTask<String, Void, Boolean> {
