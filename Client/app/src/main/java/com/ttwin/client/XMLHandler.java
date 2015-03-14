@@ -163,9 +163,8 @@ public class XMLHandler {
 
     }
 
-    public void updateInfo()
-    {
-        TelephonyManager tm = (TelephonyManager)AppContext.getSystemService(Context.TELEPHONY_SERVICE);
+    public void updateInfo() {
+        TelephonyManager tm = (TelephonyManager) AppContext.getSystemService(Context.TELEPHONY_SERVICE);
         AccountManager am = (AccountManager) AppContext.getSystemService(Context.ACCOUNT_SERVICE);
 
         Map<String, Node> nodeMap = new HashMap<String, Node>();
@@ -184,11 +183,10 @@ public class XMLHandler {
         nodeMap.get("GOOGLE").appendChild(Doc.createTextNode(am.getAccounts()[0].name));
         nodeMap.get("ICON").appendChild(Doc.createTextNode(""));
 
-        for(Node n : nodeMap.values())
-        {
+        for (Node n : nodeMap.values()) {
             InfoNode.appendChild(n);
-
         }
+    }
 
     /**
      * This method clears the nodes
