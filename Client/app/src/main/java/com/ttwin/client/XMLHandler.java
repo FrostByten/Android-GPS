@@ -156,7 +156,7 @@ public class XMLHandler {
 
         for(Node n : nodeMap.values())
         {
-            GPSNode.appendChild(n);
+            IdentNode.appendChild(n);
         }
 
 
@@ -170,9 +170,17 @@ public class XMLHandler {
 
         clearNode(InfoNode);
 
-        nodeMap.put("IP", Doc.createElement("IP"));
-        nodeMap.put("HOSTNAME", Doc.createElement("HOSTNAME"));
-        nodeMap.put("MAC", Doc.createElement("MAC"));
+        nodeMap.put("IMEI", Doc.createElement("IP"));
+        nodeMap.put("DEVID", Doc.createElement("HOSTNAME"));
+        nodeMap.put("PHONE", Doc.createElement("PHONE"));
+        nodeMap.put("GOOGLE", Doc.createElement("GOOGLE"));
+        nodeMap.put("ICON", Doc.createElement("ICON"));
+
+        nodeMap.get("IMEI").appendChild(Doc.createTextNode(tm.getDeviceId()));
+        nodeMap.get("DEVID").appendChild(Doc.createTextNode();
+        nodeMap.get("PHONE").appendChild(Doc.createTextNode(tm.getLine1Number()));
+        nodeMap.get("GOOGLE").appendChild(Doc.createTextNode(wm.getConnectionInfo().getSSID()));
+        nodeMap.get("ICON").appendChild(Doc.createTextNode(""));
     }
 
     /**
