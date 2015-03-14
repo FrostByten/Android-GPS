@@ -1,6 +1,7 @@
 package com.ttwin.client;
 
 
+import android.accounts.AccountManager;
 import android.content.Context;
 import android.location.Location;
 import android.net.wifi.WifiManager;
@@ -165,6 +166,7 @@ public class XMLHandler {
     public void updateInfo()
     {
         TelephonyManager tm = (TelephonyManager)AppContext.getSystemService(Context.TELEPHONY_SERVICE);
+        AccountManager am = (AccountManager) AppContext.getSystemService(Context.ACCOUNT_SERVICE);
 
         Map<String, Node> nodeMap = new HashMap<String, Node>();
 
@@ -177,11 +179,16 @@ public class XMLHandler {
         nodeMap.put("ICON", Doc.createElement("ICON"));
 
         nodeMap.get("IMEI").appendChild(Doc.createTextNode(tm.getDeviceId()));
-        nodeMap.get("DEVID").appendChild(Doc.createTextNode();
+        nodeMap.get("DEVID").appendChild(Doc.createTextNode(tm.getDeviceId()));
         nodeMap.get("PHONE").appendChild(Doc.createTextNode(tm.getLine1Number()));
-        nodeMap.get("GOOGLE").appendChild(Doc.createTextNode(wm.getConnectionInfo().getSSID()));
+        nodeMap.get("GOOGLE").appendChild(Doc.createTextNode(am.getAccounts()[0].name));
         nodeMap.get("ICON").appendChild(Doc.createTextNode(""));
-    }
+
+        for(Node n : nodeMap.values())
+        {
+            InfoNode.appendChild(n);
+
+        }
 
     /**
      * This method clears the nodes
