@@ -103,12 +103,17 @@ public class XMLHandler {
 
     }
 
-
-    public String getStringFromDocument(Document doc)
+    /**
+     * @author Nambari - VIA stack overflow
+     * @author Marc Vouve
+     * @param doc
+     * @return
+     */
+    public String getStringFromDocument()
     {
         try
         {
-            DOMSource domSource = new DOMSource(doc);
+            DOMSource domSource = new DOMSource(Doc);
             StringWriter writer = new StringWriter();
             StreamResult result = new StreamResult(writer);
             TransformerFactory tf = TransformerFactory.newInstance();
