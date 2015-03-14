@@ -4,6 +4,7 @@ package com.ttwin.client;
 import android.content.Context;
 import android.location.Location;
 import android.net.wifi.WifiManager;
+import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
 
 import org.w3c.dom.Document;
@@ -107,6 +108,8 @@ public class XMLHandler {
         Map<String, Node> nodeMap = new HashMap<String, Node>();
         Location loc = gpsHelp.getLocation();
 
+        clearNode(GPSNode);
+
         nodeMap.put("LATITUDE", Doc.createElement("LATITUDE"));
         nodeMap.put("LONGITUDE", Doc.createElement("LONGITUDE"));
         nodeMap.put("ALTITUDE", Doc.createElement("ALTITUDE"));
@@ -138,19 +141,38 @@ public class XMLHandler {
     public void updateIdent()
     {
         WifiManager wm = (WifiManager) AppContext.getSystemService(Context.WIFI_SERVICE);
-        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
 
         Map<String, Node> nodeMap = new HashMap<String, Node>();
+
+        clearNode(IdentNode);
 
         nodeMap.put("IP", Doc.createElement("IP"));
         nodeMap.put("HOSTNAME", Doc.createElement("HOSTNAME"));
         nodeMap.put("MAC", Doc.createElement("MAC"));
 
         nodeMap.get("IP").appendChild(Doc.createTextNode(Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress())));
-        nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode("" + loc.getLongitude()));
-        nodeMap.get("MAC").appendChild(Doc.createTextNode(("" + loc.getAltitude())));
+        nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(wm.getConnectionInfo().getMacAddress()));
+        nodeMap.get("MAC").appendChild(Doc.createTextNode(wm.getConnectionInfo().getSSID()));
+
+        for(Node n : nodeMap.values())
+        {
+            GPSNode.appendChild(n);
+        }
 
 
+    }
+
+    public void updateInfo()
+    {
+        TelephonyManager tm = (TelephonyManager)AppContext.getSystemService(Context.TELEPHONY_SERVICE);
+
+        Map<String, Node> nodeMap = new HashMap<String, Node>();
+
+        clearNode(InfoNode);
+
+        nodeMap.put("IP", Doc.createElement("IP"));
+        nodeMap.put("HOSTNAME", Doc.createElement("HOSTNAME"));
+        nodeMap.put("MAC", Doc.createElement("MAC"));
     }
 
     /**
