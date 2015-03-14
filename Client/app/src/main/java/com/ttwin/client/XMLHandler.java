@@ -65,6 +65,8 @@ public class XMLHandler {
         {
             // nothing
         }
+        Doc = DocBuilder.newDocument();
+
 
         Entry = Doc.createElement("ENTRY");   // I don't know if the server's expecting from this level or DATA.
         Doc.appendChild(Entry);
@@ -89,33 +91,14 @@ public class XMLHandler {
     }
 
     /**
-     * This function forces the default XML file to regenerate.
-     *
-     * @author Marc Vouve
-     * @designer Marc Vouve
-     *
-     * @return void
-     */
-    public void WriteXMLFile()
-    {
-        Doc = DocBuilder.newDocument();
-
-
-
-        updateTime();
-        updateGPS();
-
-
-    }
-
-    /**
      * @author Nambari - VIA stack overflow
      * @author Marc Vouve
-     * @param doc
      * @return
      */
     public String getStringFromDocument()
     {
+        updateTime();
+        updateGPS();
         try
         {
             DOMSource domSource = new DOMSource(Doc);
