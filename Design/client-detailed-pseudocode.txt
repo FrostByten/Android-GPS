@@ -1,0 +1,121 @@
+HOME ACTIVITY
+
+onCreate
+{
+    display default server host and port
+    display "go" button
+}
+
+valid (ip, port)
+{
+    call addressvalidation to validate ip
+    validate port
+    return true if valid ip and port
+}
+
+AddressValidation
+{
+    validate ip
+}
+
+go
+{
+    When go button clicked
+        launch Sending activity passing ip and port
+}
+
+SENDING ACTIVITY
+
+onCreate
+{
+    get ip and port details from home activity
+    initialize gpsHelper and XMLHandler
+}
+
+onResume
+{
+    register receiver from gpshelper to get gps location changes
+}
+
+onPause
+{
+    unregister receiver from gpshelper
+}
+
+sendLocation
+{
+    get formatted data from XML handler and send data to server
+}
+
+
+goHome
+{
+    go back to home activity
+}
+
+SendData
+
+NETWORKSERVICE
+
+onHandleIntent
+{
+    get ip, host, and data information from sending activity
+    send data to server
+}
+
+GPSHELPER
+
+getLocation
+{
+    get and return last known gps location
+}
+
+updateLocation
+{
+    set up the gps location listener to get updates based
+    on time inverval and minimum location changes
+}
+
+GPSlistener
+{
+    when location changes (based on the parameters set from updateLocation)
+    broadcast notification for gps change
+}
+
+XMLHandler
+
+XMLHandler
+{
+    create framework for XML document
+    elements should be created based on the sample XML provided (See Sample XML)
+}
+
+updateGPS
+{
+    get information from gps location and update XML document
+}
+
+updateTime
+{
+    call getTimeFormatted and update XML document with formatted time
+}
+
+updateIdent
+{
+    get client details (ip, hostname, MAC) and update XML document (See Sample XML for needed info)
+}
+
+updateInfo
+{
+    get device details (imei, phone,.. etc) and update XML document (See Sample XML for needed info)
+}
+
+clearNode
+{
+    clears all child nodes in an XML element
+}
+
+getStringFromDocument
+{
+    update gps and update time and return formatted XML as a string
+}

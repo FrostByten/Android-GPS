@@ -1,0 +1,18 @@
+Home
+{
+    get input from user for server ip and port number
+    launch sending screen with user input when go button is clicked
+}
+
+Sending
+{
+    when send button click or gps location changes
+        send gps update to server by calling SendData and pass server ip and port
+}
+
+SendData
+{
+    connect to server
+    send gps data to server
+}
+

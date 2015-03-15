@@ -1,0 +1,74 @@
+main
+{
+	setup
+	loop
+}
+
+setup
+{
+	try file
+	print loading message
+	
+	open socket
+	set reuse addr on socket
+	bind to socket
+	listen on socket
+	
+	print ready message
+}
+
+try file
+{
+	open file
+	
+	if file is invalid
+		print error message
+		quit
+}
+
+loop
+{
+	accept
+	print new client message
+	fork
+}
+
+accept
+{
+	accept from socket(blocking)
+	save new socket
+}
+
+fork
+{
+	call system fork
+	
+	if in parent
+		parent
+	else
+		child
+}
+
+parent
+{
+	close client socket
+	loop
+}
+
+child
+{
+	request suicide on parent death from kernel
+	child loop
+}
+
+child loop
+{
+	while not done reading
+		read into buffer
+	
+	jump back in file to before last DATA closing tag
+	write buffer to file
+	write closing DATA tag to file
+	
+	child loop
+}
