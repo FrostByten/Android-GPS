@@ -86,6 +86,8 @@ public class NetworkService extends IntentService {
         String port = intent.getStringExtra("PORT");
         String data = intent.getStringExtra("DATA");
 
+        Toast.makeText(getApplicationContext(), server, Toast.LENGTH_SHORT).show();
+
         try {
             // Use 10.0.2.2 for localhost testing in android studio emulator
             Socket client = new Socket(server, Integer.valueOf(port));

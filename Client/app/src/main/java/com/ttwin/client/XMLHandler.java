@@ -23,6 +23,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -52,6 +53,15 @@ public class XMLHandler {
 
     private Context AppContext;
 
+    /**
+     * This is the main constructor for the XMLHandler class.
+     *
+     * @author Marc Vouve
+     * @designer Marc Vouve
+     * @date March 12, 2015
+     * @param c
+     * @param help
+     */
     public XMLHandler(Context c, GPSHelper help)
     {
         gpsHelp = help;
@@ -88,12 +98,16 @@ public class XMLHandler {
         updateIdent();
         updateInfo();
 
+
+
     }
 
     /**
+     * @date March 12, 2015
+     * @designer Nambari
      * @author Nambari - VIA stack overflow
      * @author Marc Vouve
-     * @return
+     * @return String the formatted XML document as a string.
      */
     public String getStringFromDocument()
     {
@@ -105,8 +119,10 @@ public class XMLHandler {
             StringWriter writer = new StringWriter();
             StreamResult result = new StreamResult(writer);
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(domSource, result);
-            return writer.toString();
+            String str = writer.toString();
+            return str.substring(str.indexOf("<ENTRY>"));
         }
         catch(TransformerException ex)
         {
@@ -115,6 +131,14 @@ public class XMLHandler {
         }
     }
 
+    /**
+     * UpdateGPS - Updates the GPS tag with the users location info.
+     *
+     * @date Thursday March 12, 2015
+     * @designer Marc Vouve
+     * @author Marc Vouve
+     *
+     */
     public void updateGPS()
     {
 
@@ -140,7 +164,15 @@ public class XMLHandler {
         nodeMap.get("LONGITUDE").appendChild(Doc.createTextNode("" + loc.getLongitude()));
         nodeMap.get("ALTITUDE").appendChild(Doc.createTextNode(("" + loc.getAltitude())));
         nodeMap.get("SPEED").appendChild(Doc.createTextNode("" + loc.getSpeed()));
-        nodeMap.get("HEADING").appendChild(Doc.createElement("" + loc.getBearing()));
+        try
+        {
+            nodeMap.get("HEADING").appendChild(Doc.createElement("" + loc.getBearing()));
+        }
+        catch(Exception e)
+        {
+            // cant get bearing  so do nothing.
+        }
+
 
         clearNode(GPSNode);
 
@@ -150,12 +182,28 @@ public class XMLHandler {
         }
     }
 
+    /**
+     * UpdateTime Updates the time tag with the current time
+     *
+     * @date Thursday March 12, 2015
+     * @designer Marc Vouve
+     * @author Marc Vouve
+     *
+     */
     public void updateTime()
     {
         clearNode(TimeNode);
         TimeNode.appendChild(Doc.createTextNode(getTimeFormatted()));
     }
 
+    /**
+     * UpdateIdent - Updates the IDENT tag with connection info: IP, HOSTNAME, MAC
+     *
+     * @date Thursday March 12, 2015
+     * @designer Marc Vouve
+     * @author Marc Vouve
+     *
+     */
     public void updateIdent()
     {
         WifiManager wm = (WifiManager) AppContext.getSystemService(Context.WIFI_SERVICE);
@@ -187,6 +235,14 @@ public class XMLHandler {
 
     }
 
+    /**
+     * UpdateInfo - Updates the INFO tag with Personal Info, Phone Numer IP Google Account ETC.
+     *
+     * @date Thursday March 12, 2015
+     * @designer Marc Vouve
+     * @author Marc Vouve
+     *
+     */
     public void updateInfo() {
         TelephonyManager tm = (TelephonyManager) AppContext.getSystemService(Context.TELEPHONY_SERVICE);
         AccountManager am = (AccountManager) AppContext.getSystemService(Context.ACCOUNT_SERVICE);

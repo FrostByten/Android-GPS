@@ -74,9 +74,13 @@ public class GPSHelper {
         private String BROADCAST_ACTION = "com.ttwin.client.GPSHELPER";
 
         /**
-         * When a new location is requested, update update the onscreen textview.
+         * When location is updated, create a new Intent to handle it.
          *
-         * @param l
+         * @author Marc R
+         * @author Marc V
+         * @designer Marc R
+         * @designer Marc V
+         * @date March 14th 2015
          */
         public void onLocationChanged(Location l)
         {
