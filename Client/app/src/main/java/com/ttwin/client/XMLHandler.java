@@ -121,6 +121,8 @@ public class XMLHandler {
         Map<String, Node> nodeMap = new HashMap<String, Node>();
         Location loc = gpsHelp.getLocation();
 
+
+
         clearNode(GPSNode);
 
         nodeMap.put("LATITUDE", Doc.createElement("LATITUDE"));
@@ -129,6 +131,10 @@ public class XMLHandler {
         nodeMap.put("SPEED", Doc.createElement("SPEED"));
         nodeMap.put("HEADING", Doc.createElement("HEADING"));
 
+        if(loc == null)
+        {
+            return;
+        }
 
         nodeMap.get("LATITUDE").appendChild(Doc.createTextNode("" + loc.getLatitude()));
         nodeMap.get("LONGITUDE").appendChild(Doc.createTextNode("" + loc.getLongitude()));
@@ -146,9 +152,8 @@ public class XMLHandler {
 
     public void updateTime()
     {
-        clearNode(TimeElement);
-        TimeElement.appendChild(Doc.createTextNode(getTimeFormatted()));
-        Doc.appendChild(TimeElement);
+        clearNode(TimeNode);
+        TimeNode.appendChild(Doc.createTextNode(getTimeFormatted()));
     }
 
     public void updateIdent()
@@ -164,7 +169,14 @@ public class XMLHandler {
         nodeMap.put("MAC", Doc.createElement("MAC"));
 
         nodeMap.get("IP").appendChild(Doc.createTextNode(Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress())));
-        nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(wm.getConnectionInfo().getMacAddress()));
+        try
+        {
+            nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(wm.getConnectionInfo().getMacAddress()));
+        }
+        catch(NullPointerException e)
+        {
+
+        }
         nodeMap.get("MAC").appendChild(Doc.createTextNode(wm.getConnectionInfo().getSSID()));
 
         for(Node n : nodeMap.values())
@@ -192,7 +204,14 @@ public class XMLHandler {
         nodeMap.get("IMEI").appendChild(Doc.createTextNode(tm.getDeviceId()));
         nodeMap.get("DEVID").appendChild(Doc.createTextNode(tm.getDeviceId()));
         nodeMap.get("PHONE").appendChild(Doc.createTextNode(tm.getLine1Number()));
-        nodeMap.get("GOOGLE").appendChild(Doc.createTextNode(am.getAccounts()[0].name));
+        try
+        {
+            nodeMap.get("GOOGLE").appendChild(Doc.createTextNode(am.getAccounts()[0].name));
+        }
+        catch(IndexOutOfBoundsException e)
+        {
+            nodeMap.get("GOOGLE").appendChild(Doc.createTextNode("example@example.ca"));
+        }
         nodeMap.get("ICON").appendChild(Doc.createTextNode(""));
 
         for (Node n : nodeMap.values()) {
@@ -215,14 +234,11 @@ public class XMLHandler {
 
         while(node.hasChildNodes())
         {
-            if(node.getFirstChild().hasChildNodes())
+            while(node.getFirstChild().hasChildNodes())
             {
                 clearNode(node.getFirstChild());
             }
-            else
-            {
-                node.removeChild(node.getFirstChild());
-            }
+            node.removeChild(node.getFirstChild());
         }
 
     }
