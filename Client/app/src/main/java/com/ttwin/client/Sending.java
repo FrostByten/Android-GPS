@@ -1,7 +1,7 @@
 package com.ttwin.client;
 
 /**
- * Sending activity - activity that sends gets location changes and sends updates to the server
+ * Sending activity - activity that gets location changes and sends updates to the server
  *
  * @sourceFile	Home.java
  *
@@ -12,12 +12,14 @@ package com.ttwin.client;
  * @revision	none
  *
  * @designer	Thomas Tallentire
+ * @designer    Marc Rafanan
  *
  * @programmer	Thomas Tallentire
  * @programmer	Marc Rafanan
  *
  * @note        This activity will send gps updates to the server either my manually sending it
- *              through a send button or by automatic updates when location changes
+ *              through a send button or by automatic updates when location changes. Sending data
+ *              is done by calling NetworkService
  *
  */
 
@@ -25,20 +27,11 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.os.AsyncTask;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.net.UnknownHostException;
 
 /**
  * Sending activity - activity that sends gets location changes and sends updates to the server
@@ -52,18 +45,22 @@ import java.net.UnknownHostException;
  * @variable    private String port
  * @variable    private boolean host
  * @variable    private LocationManager locationManager
+ * @variable    private BroadcastReceiver receiver
  *
  * @method	    protected void onCreate(Bundle savedInstanceState)
+ * @method      protected void onResume()
+ * @method      protected void onPause()
  * @method	    public boolean onCreateOptionsMenu(Menu menu)
  * @method	    public boolean onOptionsItemSelected(MenuItem item)
- * @method	    private boolean valid(String ip, String port)
- * @method	    public void go(View view)
+ * @method	    public void sendLocation(View view)
+ * @method	    public void goHome(View view)
  *
  * @date		2015-03-09
  *
  * @revision	none
  *
  * @designer	Thomas Tallentire
+ * @designer    Marc Rafanan
  *
  * @programmer	Thomas Tallentire
  * @programmer	Marc Rafanan
@@ -92,9 +89,28 @@ public class Sending extends Activity {
      */
     private GPSHelper gpsHelper;
 
-    private BroadcastReceiver gpsBroadCastReceiver;
-
+    /**
+     * XMLHandler object
+     */
     private XMLHandler xmlHandler;
+
+    /**
+     * BroadcastReceiver that will get notification if gps location changed
+     * and then calls NetworkService to send xml data.
+     */
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context c, Intent i) {
+
+            Intent intent = new Intent(Sending.this, NetworkService.class);
+
+            intent.putExtra("SERVER", ip);
+            intent.putExtra("PORT", port);
+            intent.putExtra("DATA", xmlHandler.getStringFromDocument());
+            startService(intent);
+        }
+    };
 
     /**
      * Main method at activity startup
@@ -137,17 +153,61 @@ public class Sending extends Activity {
 
         xmlHandler = new XMLHandler(this, gpsHelper);
 
-        gpsBroadCastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent)
-            {
-
-                AsyncSendLocation sendlocation = new AsyncSendLocation();
-                sendlocation.execute(xmlHandler.getStringFromDocument());
-            }
-        };
     }
 
+    /**
+     * Method that will be called when application resumes
+     *
+     * @method      onResume
+     *
+     * @date		2015-03-14
+     *
+     * @revisions	none
+     *
+     * @designer	Marc Rafanan
+     *
+     * @programmer	Marc Rafanan
+     *
+     * @notes       Registers the GPSHelper receiver dynamically
+     *
+     * @signature	protected void onResume()
+     *
+     * @param
+     *
+     * @return
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter("com.ttwin.client.GPSHELPER"));
+    }
+
+    /**
+     * Method that will be called when application pauses
+     *
+     * @method      onPause
+     *
+     * @date		2015-03-14
+     *
+     * @revisions	none
+     *
+     * @designer	Marc Rafanan
+     *
+     * @programmer	Marc Rafanan
+     *
+     * @notes       Unregisters the GPSHelper receiver dynamically
+     *
+     * @signature	protected void onPause()
+     *
+     * @param
+     *
+     * @return
+     */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
+    }
 
     /**
      * Default Activity onCreateOptionsMenu method
@@ -179,39 +239,6 @@ public class Sending extends Activity {
     }
 
     /**
-     * Method called by LocationListener when gps location changes
-     *
-     * @method	    onLocationChanged(Location location)
-     *
-     * @date		2015-03-13
-     *
-     * @revisions	none
-     *
-     * @designer	Marc Rafanan
-     *
-     * @programmer	Marc Rafanan
-     *
-     * @notes       This method will be called when the location changes and fulfills parameters
-     *              set in requestLocationUpdates.
-     *
-     * @signature	private boolean valid(String ip, String port)
-     *
-     * @param location
-     *
-     * @return  void
-     */
-    public void gpsLocationChanged(Location location)
-    {
-        double lat = location.getLatitude();
-        double lng = location.getLongitude();
-
-        Log.d("onLocationChanged", String.valueOf(lat) + " " + String.valueOf(lng));
-
-        AsyncSendLocation sendlocation = new AsyncSendLocation();
-        sendlocation.execute(String.valueOf(lat), String.valueOf(lng));
-    }
-
-    /**
      * onClick method for manually sending gps updates to the server
      *
      * @method	    sendLocation
@@ -232,21 +259,12 @@ public class Sending extends Activity {
      */
     public void sendLocation(View view)
     {
-        GPSHelper gpsHelper = new GPSHelper(this);
+        Intent intent = new Intent(Sending.this, NetworkService.class);
 
-        Location location = gpsHelper.getLocation();
-
-        if(location == null)
-        {
-            // do not send anything if there is no fix
-            return;
-        }
-
-        double lat = (double)(location.getLatitude());
-        double lng = (double)(location.getLongitude());
-
-        AsyncSendLocation sendlocation = new AsyncSendLocation();
-        sendlocation.execute(String.valueOf(lat), String.valueOf(lng));
+        intent.putExtra("SERVER", ip);
+        intent.putExtra("PORT", port);
+        intent.putExtra("DATA", xmlHandler.getStringFromDocument());
+        startService(intent);
     }
 
     /**
@@ -267,65 +285,5 @@ public class Sending extends Activity {
     public void goHome(View view)
     {
         finish();
-    }
-
-    /**
-     * AsyncSendLocation inner class
-     * @class       AsyncSendLocation
-     *
-     * @method	    protected Void doInBackground(String... param)
-     *
-     * @date		2015-03-13
-     *
-     * @revision	none
-     *
-     * @designer	Marc Rafanan
-     *
-     * @programmer	Marc Rafanan
-     *
-     * @note        An inner class that extends AsyncTask to send gps location to the server. This
-     *              is used because Android will complain if there are network processes (or any
-     *              long running process) running in the main UI thread.
-     *
-     */
-    private class AsyncSendLocation extends AsyncTask<String, Void, Void> {
-
-        @Override
-        protected Void doInBackground(String... param) {
-
-            String xml = param[0];
-
-            try
-            {
-                // Use 10.0.2.2 for localhost testing in android studio emulator
-                Socket client = new Socket(ip, Integer.valueOf(port));
-                OutputStream outToServer = client.getOutputStream();
-                DataOutputStream out = new DataOutputStream(outToServer);
-
-                // Send data (Should be in xml form)
-                out.writeUTF(xml);
-
-                client.close();
-            }
-            catch(UnknownHostException e)
-            {
-                // this should not happen because the ip is already validated
-                e.printStackTrace();
-            }
-            catch(IOException e)
-            {
-
-                e.printStackTrace();
-                runOnUiThread(new Runnable() {
-                    public void run() {
-
-                        Toast.makeText(Sending.this, "Connection Error", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                finish();
-            }
-
-            return null;
-        }
     }
 }

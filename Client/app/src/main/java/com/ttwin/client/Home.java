@@ -306,14 +306,5 @@ public class Home extends Activity {
 
             return true;
         }
-
-        /**
-         * Default onPostExecute Method
-         * @param result
-         */
-        @Override
-        protected void onPostExecute(Boolean result) {
-            //do nothing
-        }
     }
 }
