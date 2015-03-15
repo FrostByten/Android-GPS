@@ -104,8 +104,7 @@ public class XMLHandler {
             DOMSource domSource = new DOMSource(Doc);
             StringWriter writer = new StringWriter();
             StreamResult result = new StreamResult(writer);
-            TransformerFactory tf = TransformerFactory.newInstance();
-            Transformer transformer = tf.newTransformer();
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.transform(domSource, result);
             return writer.toString();
         }
