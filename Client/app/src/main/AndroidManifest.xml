@@ -28,6 +28,9 @@
         <activity
             android:name=".Sending"
             android:label="@string/title_activity_sending" >
+            <intent-filter>
+                <action android:name="com.ttwin.client.GPSHELPER"></action>
+            </intent-filter>
         </activity>
     </application>
 

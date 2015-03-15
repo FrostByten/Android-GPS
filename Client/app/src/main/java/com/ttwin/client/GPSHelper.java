@@ -1,6 +1,7 @@
 package com.ttwin.client;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -10,6 +11,8 @@ import android.os.Bundle;
  * Created by Marc on 2015-03-11.
  */
 public class GPSHelper {
+
+    Context context;
     LocationManager lManager;
     //LocationProvider lProvider;
     LocationListener lListener;
@@ -23,6 +26,7 @@ public class GPSHelper {
 
     public GPSHelper( Context c)
     {
+        context = c;
         lManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
         lListener = new GPSListener();
         updateLocation();
@@ -66,6 +70,9 @@ public class GPSHelper {
     }
 
     private class GPSListener implements LocationListener {
+
+        private String BROADCAST_ACTION = "com.ttwin.client.GPSHELPER";
+
         /**
          * When a new location is requested, update update the onscreen textview.
          *
@@ -73,7 +80,9 @@ public class GPSHelper {
          */
         public void onLocationChanged(Location l)
         {
-            //TODO what should happen when the location changes?
+            Intent broadcast = new Intent();
+            broadcast.setAction(BROADCAST_ACTION);
+            context.sendBroadcast(broadcast);
         }
         public void onStatusChanged(String provider, int status, Bundle extras) {}
         public void onProviderEnabled(String s) {}

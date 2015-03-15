@@ -22,10 +22,10 @@ package com.ttwin.client;
  */
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -70,7 +70,7 @@ import java.net.UnknownHostException;
  *
  * @note
  */
-public class Sending extends Activity implements LocationListener {
+public class Sending extends Activity {
 
     /**
      * server ip
@@ -88,9 +88,13 @@ public class Sending extends Activity implements LocationListener {
     private boolean host = false;
 
     /**
-     * locationManager object
+     * GPSHelper object
      */
-    private LocationManager locationManager;
+    private GPSHelper gpsHelper;
+
+    private BroadcastReceiver gpsBroadCastReceiver;
+
+    private XMLHandler xmlHandler;
 
     /**
      * Main method at activity startup
@@ -129,13 +133,19 @@ public class Sending extends Activity implements LocationListener {
             host = false;
         }
 
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        gpsHelper = new GPSHelper(this);
 
-        int INTERVAL = 1000;
+        xmlHandler = new XMLHandler(this, gpsHelper);
 
-        //requestLocationUpdates(provider, minTime, minDistance, listener)
-        locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, INTERVAL, 10, this);
-        locationManager.requestLocationUpdates( LocationManager.PASSIVE_PROVIDER, INTERVAL, 10, this);
+        gpsBroadCastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+
+                AsyncSendLocation sendlocation = new AsyncSendLocation();
+                sendlocation.execute(xmlHandler.getStringFromDocument());
+            }
+        };
     }
 
 
@@ -190,8 +200,7 @@ public class Sending extends Activity implements LocationListener {
      *
      * @return  void
      */
-    @Override
-    public void onLocationChanged(Location location)
+    public void gpsLocationChanged(Location location)
     {
         double lat = location.getLatitude();
         double lng = location.getLongitude();
@@ -200,38 +209,6 @@ public class Sending extends Activity implements LocationListener {
 
         AsyncSendLocation sendlocation = new AsyncSendLocation();
         sendlocation.execute(String.valueOf(lat), String.valueOf(lng));
-    }
-
-    /**
-     * Default onProviderDisabled method
-     * @param provider
-     */
-    @Override
-    public void onProviderDisabled(String provider)
-    {
-        Toast.makeText(getBaseContext(), "Gps turned off ", Toast.LENGTH_LONG).show();
-    }
-
-    /**
-     * Default onProviderEnabled method
-     * @param provider
-     */
-    @Override
-    public void onProviderEnabled(String provider)
-    {
-        Toast.makeText(getBaseContext(), "Gps turned on ", Toast.LENGTH_LONG).show();
-    }
-
-    /**
-     * Default onStatusChanged method
-     * @param provider
-     * @param status
-     * @param extras
-     */
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras)
-    {
-        // TODO Auto-generated method stub
     }
 
     /**
@@ -316,8 +293,7 @@ public class Sending extends Activity implements LocationListener {
         @Override
         protected Void doInBackground(String... param) {
 
-            String lat = param[0];
-            String lng = param[1];
+            String xml = param[0];
 
             try
             {
@@ -327,7 +303,7 @@ public class Sending extends Activity implements LocationListener {
                 DataOutputStream out = new DataOutputStream(outToServer);
 
                 // Send data (Should be in xml form)
-                out.writeUTF("Latitude: " + lat + " Longitude: " + lng);
+                out.writeUTF(xml);
 
                 client.close();
             }
