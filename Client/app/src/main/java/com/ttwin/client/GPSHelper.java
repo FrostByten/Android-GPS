@@ -19,12 +19,25 @@ public class GPSHelper {
     private final int GPS_INTERVAL_TIME_MS = 10000;
     private final int GPS_DISTANCE_DELTA_M = 10;
 
-    private GPSHelper()
-    {
+    /* disable default constructor */
+    private GPSHelper(){}
 
-    }
-
-    public GPSHelper( Context c)
+    /**
+     * Default GPS Helper constructor
+     *
+     * @method GPSHelper
+     *
+     * @date March 9, 2015
+     *
+     * @author Marc Vouve
+     *
+     * @designer Marc Vouve
+     *
+     * @signature GPSHelper(Context c)
+     *
+     * @param c the application context.
+     */
+    public GPSHelper(Context c)
     {
         context = c;
         lManager = (LocationManager) c.getSystemService(Context.LOCATION_SERVICE);
@@ -33,6 +46,21 @@ public class GPSHelper {
     }
 
 
+    /**
+     * Sets the location Manager up to update locations.
+     *
+     * @method updateLocation
+     *
+     * @date March 9, 2015
+     *
+     * @author Marc Vouve
+     *
+     * @designer Marc Vouve
+     *
+     * @returns void
+     *
+     * @signature private void updateLocation
+     */
     public Location getLocation()
     {
         if(lManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) != null)
@@ -51,6 +79,24 @@ public class GPSHelper {
         return null;
     }
 
+
+    /**
+     * Sets the location Manager up to update locations.
+     *
+     * @method updateLocation
+     *
+     * @date March 9, 2015
+     *
+     * @revision March 15, 2015 - Changed to use GPS before network.
+     *
+     * @author Marc Vouve
+     *
+     * @designer Marc Vouve
+     *
+     * @returns void
+     *
+     * @signature private void updateLocation
+     */
     private void updateLocation()
     {
 
@@ -77,11 +123,19 @@ public class GPSHelper {
         /**
          * When location is updated, create a new Intent to handle it.
          *
+         * @method onLocationChanged
+         *
          * @author Marc R
          * @author Marc V
+         *
          * @designer Marc R
          * @designer Marc V
+         *
          * @date March 14th 2015
+         *
+         * @signature onLocationChanged Location l
+         *
+         * @param l Location the location passed to the Listener.
          */
         public void onLocationChanged(Location l)
         {

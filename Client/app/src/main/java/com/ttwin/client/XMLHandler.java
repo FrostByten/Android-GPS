@@ -62,10 +62,14 @@ public class XMLHandler {
      * This is the main constructor for the XMLHandler class.
      *
      * @author Marc Vouve
+     *
      * @designer Marc Vouve
+     *
      * @date March 12, 2015
-     * @param c
-     * @param help
+     *
+     * @param c Context the current device context.
+     * @param help A GPS Helper to get GPS fixes.
+     *
      */
     public XMLHandler(Context c, GPSHelper help)
     {
