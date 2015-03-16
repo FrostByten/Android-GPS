@@ -323,8 +323,7 @@ public class XMLHandler {
     {
 
         SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT, Locale.CANADA);
-
-        return sdf.format(new Date(gpsHelp.getLocation().getTime()));
+        return sdf.format(new Date(System.currentTimeMillis()));
     }
 
     public String inet_ntop(int ip)
