@@ -13,8 +13,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.io.StringWriter;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -251,8 +253,8 @@ public class XMLHandler {
 
         clearNode(InfoNode);
 
-        nodeMap.put("IMEI", Doc.createElement("IP"));
-        nodeMap.put("DEVID", Doc.createElement("HOSTNAME"));
+        nodeMap.put("IMEI", Doc.createElement("IMEI"));
+        nodeMap.put("DEVID", Doc.createElement("DEVID"));
         nodeMap.put("PHONE", Doc.createElement("PHONE"));
         nodeMap.put("GOOGLE", Doc.createElement("GOOGLE"));
         nodeMap.put("ICON", Doc.createElement("ICON"));
@@ -310,10 +312,24 @@ public class XMLHandler {
      */
     private String getTimeFormatted()
     {
-        final int time =  Calendar.getInstance().get(Calendar.SECOND);
 
         SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT, Locale.CANADA);
 
-        return sdf.format(new Date(time));
+        return sdf.format(new Date(gpsHelp.getLocation().getTime()));
+    }
+
+    public String inet_ntop(int ip)
+    {
+        byte[] bytes = BigInteger.valueOf(ip).toByteArray();
+
+        try
+        {
+            return InetAddress.getByAddress(bytes).toString();
+        }
+        catch(UnknownHostException e)
+        {
+            return null;
+        }
+
     }
 }
