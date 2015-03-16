@@ -19,9 +19,9 @@ package com.ttwin.client;
  *
  */
 
-import android.app.IntentService;
+import android.app.Service;
 import android.content.Intent;
-import android.widget.Toast;
+import android.os.IBinder;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,7 +29,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 /**
- * NetworkService - Intent service that handles sending TCP datagram to server
+ * NetworkService - service that handles sending TCP datagram to server
  *
  * @class       NetworkService
  *
@@ -37,8 +37,8 @@ import java.net.UnknownHostException;
  *
  * @program		Client
  *
- * @method	    NetworkService()
- * @method      protected void onHandleIntent(Intent intent)
+ * @method	    public IBinder onBind(Intent intent)
+ * @method      public int onStartCommand(Intent intent, int flags, int startId)
  *
  * @date		2015-03-14
  *
@@ -50,28 +50,22 @@ import java.net.UnknownHostException;
  *
  * @note
  */
-public class NetworkService extends IntentService {
-
-    public NetworkService()
-    {
-        super("NetworkService");
-    }
+public class NetworkService extends Service {
 
     /**
-     * Overrides IntentService method.
+     * Overrides Service method.
      *
-     * @method      onHandleIntent
+     * @method      onStartCommand
      *
      * @date		2015-03-09
      *
-     * @revisions	2015-03-15 fixed output stream Marc Vouve
+     * @revisions	none
      *
      * @designer	Marc Rafanan
      *
      * @programmer	Marc Rafanan
-     *              Marc Vouve
      *
-     * @notes       This method will run asynchronously
+     * @notes       This method will create a thread to send data to server
      *
      * @signature	protected void onCreate(Bundle savedInstanceState)
      *
@@ -80,30 +74,55 @@ public class NetworkService extends IntentService {
      * @return       void
      */
     @Override
-    protected void onHandleIntent(Intent intent) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
 
-        String server = intent.getStringExtra("SERVER");
-        String port = intent.getStringExtra("PORT");
-        String data = intent.getStringExtra("DATA");
+        final String server = intent.getStringExtra("SERVER");
+        final String port = intent.getStringExtra("PORT");
+        final String data = intent.getStringExtra("DATA");
 
-        Toast.makeText(getApplicationContext(), server, Toast.LENGTH_SHORT).show();
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    // Use 10.0.2.2 for localhost testing in android studio emulator
+                    Socket client = new Socket(server, Integer.valueOf(port));
+                    OutputStream outToServer = client.getOutputStream();
 
-        try {
-            // Use 10.0.2.2 for localhost testing in android studio emulator
-            Socket client = new Socket(server, Integer.valueOf(port));
-            OutputStream outToServer = client.getOutputStream();
+                    // Send data (Should be in xml form)
+                    outToServer.write(data.getBytes());
 
-            // Send data (Should be in xml form)
-            outToServer.write(data.getBytes());
+                    client.close();
+                } catch (UnknownHostException e) {
+                    // this should not happen because the ip is already validated
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
 
-            client.close();
-        } catch (UnknownHostException e) {
-            // this should not happen because the ip is already validated
+        thread.start();
+
+        try
+        {
+            thread.join();
+            stopSelf();
+        } catch (InterruptedException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-
-            e.printStackTrace();
-            Toast.makeText(getApplicationContext(), "Connection Error", Toast.LENGTH_SHORT).show();
         }
+
+        return Service.START_NOT_STICKY;
+    }
+
+    /**
+     * Default onBind Method
+     *
+     * @param intent
+     * @return
+     */
+    @Override
+    public IBinder onBind(Intent intent) {
+        // DO nothing
+        return null;
     }
 }
