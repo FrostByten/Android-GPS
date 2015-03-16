@@ -14,10 +14,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.io.StringWriter;
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -36,9 +34,24 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 /**
- * This class is to format and produce an XML document for the APP.
+ * @File XMLHandler.java
  *
- * Created by Marc on 2015-03-11.
+ * @class XMLHandler
+ *
+ * @date 2015-03-11
+ *
+ * @designer Marc Vouve
+ *
+ * @programmer Marc Vouve
+ *
+ * @method XMLHanlder(Context, GPSHelper) String
+ * @method getStringFromDocument() void
+ * @method updateGPS() void
+ * @method updateTime() void
+ * @method updateIdent() void
+ * @method updateInfo() void
+ * @method clearNode() void
+ * @method getTimeFormatted() void
  */
 public class XMLHandler {
 
@@ -49,7 +62,6 @@ public class XMLHandler {
     final private static String TIME_FORMAT = "yyyy-MM-dd HH:mm";
 
     Element Entry;
-    Element TimeElement;
     Element TimeNode;
     Element GPSNode;
     Element IdentNode;
@@ -66,6 +78,8 @@ public class XMLHandler {
      * @designer Marc Vouve
      *
      * @date March 12, 2015
+     *
+     * @signature XMLHandler(Context c, GPSHelper help)
      *
      * @param c Context the current device context.
      * @param help A GPS Helper to get GPS fixes.
@@ -113,9 +127,17 @@ public class XMLHandler {
 
     /**
      * @date March 12, 2015
+     *
      * @designer Nambari
+     *
+     * @designer Marc Vouve
+     *
      * @author Nambari - VIA stack overflow
+     *
      * @author Marc Vouve
+     *
+     * @signature String getStringFromDocument
+     *
      * @return String the formatted XML document as a string.
      */
     public String getStringFromDocument()
@@ -145,9 +167,15 @@ public class XMLHandler {
     /**
      * UpdateGPS - Updates the GPS tag with the users location info.
      *
+     * @method updateGPS
+     *
      * @date Thursday March 12, 2015
+     *
      * @designer Marc Vouve
+     *
      * @author Marc Vouve
+     *
+     * @signature void updateGPS()
      *
      */
     public void updateGPS()
@@ -276,9 +304,15 @@ public class XMLHandler {
     /**
      * UpdateInfo - Updates the INFO tag with Personal Info, Phone Numer IP Google Account ETC.
      *
+     * @method updateInfo(
+     *
      * @date Thursday March 12, 2015
+     *
      * @designer Marc Vouve
+     *
      * @author Marc Vouve
+     *
+     * @signature updateInfo()
      *
      */
     public void updateInfo() {
@@ -316,9 +350,15 @@ public class XMLHandler {
     /**
      * This method clears the nodes
      *
+     * @method clearNode
+     *
      * @date March 10, 2015
+     *
      * @author Marc Vouve
+     *
      * @designer Marc Vouve
+     *
+     * @signature void clearNode(Node node)
      *
      * @param node node to clear
      */
@@ -340,9 +380,15 @@ public class XMLHandler {
     /**
      * Returns a formatted string of the current time and date.
      *
+     * @method getTimeFormatted
+     *
      * @date March 10, 2015
+     *
      * @author Marc Vouve
+     *
      * @designer Marc Vouve
+     *
+     * @signature String getTimeFormatted
      *
      * @return string in TIME_FORMAT
      */
@@ -351,20 +397,5 @@ public class XMLHandler {
 
         SimpleDateFormat sdf = new SimpleDateFormat(TIME_FORMAT, Locale.CANADA);
         return sdf.format(new Date(System.currentTimeMillis()));
-    }
-
-    public String inet_ntop(int ip)
-    {
-        byte[] bytes = BigInteger.valueOf(ip).toByteArray();
-
-        try
-        {
-            return InetAddress.getByAddress(bytes).toString();
-        }
-        catch(UnknownHostException e)
-        {
-            return null;
-        }
-
     }
 }

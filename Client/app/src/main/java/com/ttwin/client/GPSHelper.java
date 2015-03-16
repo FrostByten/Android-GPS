@@ -8,6 +8,28 @@ import android.location.LocationManager;
 import android.os.Bundle;
 
 /**
+ * @File GPSHelper
+ *
+ * @class GPSHelper
+ *
+ * @program Client
+ *
+ * @date 2015 - 3 - 9
+ *
+ * @designer Marc Vouve
+ *
+ * @programmer Marc Vouve
+ *
+ * @method GPSHelper()
+ * @method GPSHelper(Context)constructor
+ * @method getLocation()
+ * @method updateLocation()
+ *
+ * @notes this file takes care of GPS issues with the Comm Stalker Project.
+ *
+ */
+
+/**
  * Created by Marc on 2015-03-11.
  */
 public class GPSHelper {

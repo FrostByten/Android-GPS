@@ -1,24 +1,5 @@
 package com.ttwin.client;
 
-/**
- * Client home activity to initialize the connection to the server
- *
- * @sourceFile	Home.java
- *
- * @program		Client
- *
- * @date		2015-03-09
- *
- * @revision	none
- *
- * @designer	Thomas Tallentire
- *
- * @programmer	Thomas Tallentire
- * @programmer  Marc Rafanan
- *
- * @note
- */
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
