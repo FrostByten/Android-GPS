@@ -23,7 +23,6 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.widget.Toast;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -65,11 +64,12 @@ public class NetworkService extends IntentService {
      *
      * @date		2015-03-09
      *
-     * @revisions	none
+     * @revisions	2015-03-15 fixed output stream Marc Vouve
      *
      * @designer	Marc Rafanan
      *
      * @programmer	Marc Rafanan
+     *              Marc Vouve
      *
      * @notes       This method will run asynchronously
      *
@@ -92,10 +92,9 @@ public class NetworkService extends IntentService {
             // Use 10.0.2.2 for localhost testing in android studio emulator
             Socket client = new Socket(server, Integer.valueOf(port));
             OutputStream outToServer = client.getOutputStream();
-            DataOutputStream out = new DataOutputStream(outToServer);
 
             // Send data (Should be in xml form)
-            out.writeUTF(data);
+            outToServer.write(data.getBytes());
 
             client.close();
         } catch (UnknownHostException e) {

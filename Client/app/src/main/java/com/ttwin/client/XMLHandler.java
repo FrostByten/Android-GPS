@@ -7,6 +7,7 @@ import android.location.Location;
 import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 import android.text.format.Formatter;
+import android.util.Log;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -19,6 +20,7 @@ import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -125,6 +127,8 @@ public class XMLHandler {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(domSource, result);
             String str = writer.toString();
+
+            Log.d("[XML]", str.substring(str.indexOf("<ENTRY>")));
             return str.substring(str.indexOf("<ENTRY>"));
         }
         catch(TransformerException ex)
@@ -169,11 +173,11 @@ public class XMLHandler {
         nodeMap.get("SPEED").appendChild(Doc.createTextNode("" + loc.getSpeed()));
         try
         {
-            nodeMap.get("HEADING").appendChild(Doc.createElement("" + loc.getBearing()));
+            nodeMap.get("HEADING").appendChild(Doc.createTextNode("" + loc.getBearing()));
         }
         catch(Exception e)
         {
-            // cant get bearing  so do nothing.
+            nodeMap.get("HEADING").appendChild(Doc.createTextNode("0.0"));
         }
 
 
@@ -220,17 +224,35 @@ public class XMLHandler {
 
         try
         {
-            NetworkInterface intf = NetworkInterface.getNetworkInterfaces().nextElement();
-            nodeMap.get("IP").appendChild(Doc.createTextNode(intf.getInetAddresses().nextElement().getAddress().toString()));
-            nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(intf.getInetAddresses().nextElement().getHostName()));
-            nodeMap.get("MAC").appendChild(Doc.createTextNode(intf.getHardwareAddress().toString()));
+            for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                NetworkInterface intf = en.nextElement();
+                for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+                    InetAddress inetAddress = enumIpAddr.nextElement();
+                    if (!inetAddress.isLoopbackAddress()) {
+                        nodeMap.get("IP").appendChild(Doc.createTextNode(inetAddress.getAddress().toString()));
+                        if(inetAddress.getHostName() != null)
+                        {
+                            nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(inetAddress.getHostName()));
+                        }
+                        nodeMap.get("MAC").appendChild(Doc.createTextNode(intf.getHardwareAddress().toString()));
+                    }
+                }
+            }
+
         }catch(Exception e)
         {
             WifiManager wm = (WifiManager) AppContext.getSystemService(Context.WIFI_SERVICE);
 
             nodeMap.get("IP").appendChild(Doc.createTextNode(Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress())));
             nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(""));
-            nodeMap.get("MAC").appendChild(Doc.createTextNode(wm.getConnectionInfo().getMacAddress()));
+            try{
+                nodeMap.get("MAC").appendChild(Doc.createTextNode(wm.getConnectionInfo().getMacAddress()));
+            }
+            catch( NullPointerException n)
+            {
+                // do nothing
+            }
+
         }
 
 
