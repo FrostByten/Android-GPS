@@ -44,7 +44,7 @@ function loadMarkers()
 		
 		for(var i = 0; i < xml.length; i++)
 		{
-			var name = xml[i].getElementsByTagName("HOSTNAME")[0].innerHTML;
+			var name = xml[i].getElementsByTagName("IP")[0].innerHTML;
 			name = name.concat(at);
 			name = name.concat(xml[i].getElementsByTagName("TIME")[0].innerHTML);
 			

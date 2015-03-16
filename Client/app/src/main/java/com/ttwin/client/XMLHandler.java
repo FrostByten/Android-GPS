@@ -229,7 +229,7 @@ public class XMLHandler {
                 for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
                     InetAddress inetAddress = enumIpAddr.nextElement();
                     if (!inetAddress.isLoopbackAddress()) {
-                        nodeMap.get("IP").appendChild(Doc.createTextNode(inetAddress.getAddress().toString()));
+                        nodeMap.get("IP").appendChild(Doc.createTextNode(inetAddress.getHostAddress()));
                         if(inetAddress.getHostName() != null)
                         {
                             nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(inetAddress.getHostName()));
@@ -241,6 +241,7 @@ public class XMLHandler {
 
         }catch(Exception e)
         {
+            e.getStackTrace();
             WifiManager wm = (WifiManager) AppContext.getSystemService(Context.WIFI_SERVICE);
 
             nodeMap.get("IP").appendChild(Doc.createTextNode(Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress())));

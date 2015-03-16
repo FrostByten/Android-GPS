@@ -16,7 +16,7 @@ public class GPSHelper {
     LocationManager lManager;
     //LocationProvider lProvider;
     LocationListener lListener;
-    private final int GPS_INTERVAL_TIME_MS = 5000;
+    private final int GPS_INTERVAL_TIME_MS = 10000;
     private final int GPS_DISTANCE_DELTA_M = 10;
 
     private GPSHelper()
@@ -53,16 +53,17 @@ public class GPSHelper {
 
     private void updateLocation()
     {
-        if ( lManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) )
+
+        if ( lManager.isProviderEnabled(LocationManager.GPS_PROVIDER ) )
         {
-            lManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+            lManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     GPS_INTERVAL_TIME_MS,
                     GPS_DISTANCE_DELTA_M,
                     lListener);
         }
-        else if ( lManager.isProviderEnabled(LocationManager.GPS_PROVIDER ) )
+        else if ( lManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) )
         {
-            lManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+            lManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
                     GPS_INTERVAL_TIME_MS,
                     GPS_DISTANCE_DELTA_M,
                     lListener);

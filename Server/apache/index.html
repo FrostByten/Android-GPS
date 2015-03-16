@@ -4,32 +4,35 @@
     <style>
     	body
     	{
-			background-image: url("http://i47.tinypic.com/r0bntj.jpg");
+			/*background-image: url("http://i47.tinypic.com/r0bntj.jpg");
 			background-repeat: repeat;
-			overflow-x: hidden;
+			overflow-x: hidden;*/
 		}
     </style>
-    <link rel="icon" href="https://c2.staticflickr.com/8/7025/6482768119_b0e27c6390.jpg" type="image/x-icon"/>
+    <!--<link rel="icon" href="https://c2.staticflickr.com/8/7025/6482768119_b0e27c6390.jpg" type="image/x-icon"/>-->
     <script src="http://maps.googleapis.com/maps/api/js"></script>
-    <script src="javascript/snowstorm.js"></script>
+    <!--<script src="javascript/snowstorm.js"></script>
     <script language="JavaScript" src="javascript/JSFX_Layer.js"></script>
 	<script language="JavaScript" src="javascript/JSFX_Mouse.js"></script>
-	<script language="JavaScript" src="javascript/JSFX_pinwheel.js"></script>
+	<script language="JavaScript" src="javascript/JSFX_pinwheel.js"></script>-->
 	<script language="JavaScript" src="javascript/markers.js"></script>
 	<script language="JavaScript">
 		function JSFX_StartEffects()
 		{
-			JSFX.Pinwheel();
+			/*JSFX.Pinwheel();*/
 		}
-		
+		/*
     	snowStorm.snowColor = '#ffff00';
     	snowStorm.flakesMaxActive = 250;
     	snowStorm.useTwinkleEffect = true;
     	snowStorm.flakesMax = 500;
     	//snowStorm.snowCharacter = '☭'
     	snowStorm.useMeltEffect = true;
-    	
+    	*/
 		google.maps.event.addDomListener(window, 'load', initialize);
+		
+		// because why use a websocket when you can just call a function to poll for events?
+		window.setInterval("loadMarkers", 1000);
     </script>
   </head>
   <body onLoad="JSFX_StartEffects()">
