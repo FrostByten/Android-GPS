@@ -105,7 +105,7 @@ public class NetworkService extends Service {
 
         try
         {
-            thread.join();
+            thread.join(5000);
             stopSelf();
         } catch (InterruptedException e) {
             e.printStackTrace();
