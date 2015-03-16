@@ -15,6 +15,8 @@ import org.w3c.dom.Node;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -208,26 +210,41 @@ public class XMLHandler {
      */
     public void updateIdent()
     {
-        WifiManager wm = (WifiManager) AppContext.getSystemService(Context.WIFI_SERVICE);
-
         Map<String, Node> nodeMap = new HashMap<String, Node>();
 
         clearNode(IdentNode);
+        //WifiManager wm = (WifiManager) AppContext.getSystemService(Context.WIFI_SERVICE);
 
         nodeMap.put("IP", Doc.createElement("IP"));
         nodeMap.put("HOSTNAME", Doc.createElement("HOSTNAME"));
         nodeMap.put("MAC", Doc.createElement("MAC"));
 
-        nodeMap.get("IP").appendChild(Doc.createTextNode(Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress())));
         try
         {
-            nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(wm.getConnectionInfo().getMacAddress()));
-        }
-        catch(NullPointerException e)
+            NetworkInterface intf = NetworkInterface.getNetworkInterfaces().nextElement();
+            nodeMap.get("IP").appendChild(Doc.createTextNode(intf.getInetAddresses().nextElement().getAddress().toString()));
+            nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(intf.getInetAddresses().nextElement().getHostName()));
+            nodeMap.get("MAC").appendChild(Doc.createTextNode(intf.getHardwareAddress().toString()));
+        }catch(SocketException e)
         {
+            WifiManager wm = (WifiManager) AppContext.getSystemService(Context.WIFI_SERVICE);
 
+            nodeMap.get("IP").appendChild(Doc.createTextNode(Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress())));
+            try
+            {
+                nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(wm.getConnectionInfo().getMacAddress()));
+            }
+            catch(NullPointerException b)
+            {
+
+            }
+            nodeMap.get("MAC").appendChild(Doc.createTextNode(wm.getConnectionInfo().getSSID()));
         }
-        nodeMap.get("MAC").appendChild(Doc.createTextNode(wm.getConnectionInfo().getSSID()));
+
+
+
+
+
 
         for(Node n : nodeMap.values())
         {
