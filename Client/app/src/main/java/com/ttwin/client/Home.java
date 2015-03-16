@@ -30,7 +30,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.net.InetAddress;
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
 
@@ -61,6 +63,11 @@ import java.util.concurrent.ExecutionException;
  */
 public class Home extends Activity {
     SharedPreferences pref;
+
+    /**
+     * Timeout value when checking connection
+     */
+    private static final int TIMEOUT = 3000;
 
     /**
      * Main method at activity startup
@@ -147,16 +154,15 @@ public class Home extends Activity {
      * @return      boolean - valid or invalid inputs
      */
     private boolean valid(String ip, String port) {
-        int portsize = port.length();
 
         Boolean validAddress = false;
 
         try
         {
-            validAddress = new AddressValidation().execute(ip).get();
+            validAddress = new AddressValidation().execute(ip, port).get();
             if(!validAddress)
             {
-                Toast.makeText(getApplicationContext(), "Invalid ip address", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Invalid host/port", Toast.LENGTH_SHORT).show();
                 return false;
             }
         }
@@ -171,16 +177,7 @@ public class Home extends Activity {
             return false;
         }
 
-        for (int i = 0; i < portsize; i++)
-        {
-            if (!(Character.isDigit(port.charAt(i))))
-            {
-                Toast.makeText(getApplicationContext(), "Invalid port", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        }
-
-        Toast.makeText(getApplicationContext(), "connection successful", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Connection Successful", Toast.LENGTH_SHORT).show();
 
         return true;
     }
@@ -272,36 +269,23 @@ public class Home extends Activity {
          *
          * @signature   protected Boolean doInBackground(String... ip)
          *
-         * @param ip
+         * @param       param
          * @return Boolean - valid or invalid ip
          */
         @Override
-        protected Boolean doInBackground(String... ip) {
+        protected Boolean doInBackground(String... param) {
 
-            InetAddress address;
-            String[] rawipstring;
-            byte[] rawip = new byte[4];
-
-            // Check if host name or ip address
-            if (ip[0].charAt(0) > 57 || ip[0].charAt(0) < 48)
-            {
-                try{
-                    address = InetAddress.getByName(ip[0]);
-                } catch (UnknownHostException e) {
-                    return false;
-                }
-            } else
-            {
-                try{
-                    rawipstring = ip[0].split(".");
-                    for (int i = 0; i < rawipstring.length; i++)
-                    {
-                        rawip[i] = Byte.parseByte(rawipstring[i]);
-                    }
-                    address = InetAddress.getByAddress(rawip);
-                } catch (UnknownHostException e) {
-                    return false;
-                }
+            try {
+                // Use 10.0.2.2 for localhost testing in android studio emulator
+                // Connect and disconnect to test the server
+                Socket client = new Socket();
+                client.connect(new InetSocketAddress(param[0], Integer.valueOf(param[1])), TIMEOUT);
+                client.close();
+            } catch (UnknownHostException e) {
+                return false;
+            }
+            catch (IOException e) {
+                return false;
             }
 
             return true;
