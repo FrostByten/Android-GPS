@@ -16,7 +16,6 @@ import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -225,20 +224,13 @@ public class XMLHandler {
             nodeMap.get("IP").appendChild(Doc.createTextNode(intf.getInetAddresses().nextElement().getAddress().toString()));
             nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(intf.getInetAddresses().nextElement().getHostName()));
             nodeMap.get("MAC").appendChild(Doc.createTextNode(intf.getHardwareAddress().toString()));
-        }catch(SocketException e)
+        }catch(Exception e)
         {
             WifiManager wm = (WifiManager) AppContext.getSystemService(Context.WIFI_SERVICE);
 
             nodeMap.get("IP").appendChild(Doc.createTextNode(Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress())));
-            try
-            {
-                nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(wm.getConnectionInfo().getMacAddress()));
-            }
-            catch(NullPointerException b)
-            {
-
-            }
-            nodeMap.get("MAC").appendChild(Doc.createTextNode(wm.getConnectionInfo().getSSID()));
+            nodeMap.get("HOSTNAME").appendChild(Doc.createTextNode(""));
+            nodeMap.get("MAC").appendChild(Doc.createTextNode(wm.getConnectionInfo().getMacAddress()));
         }
 
 
